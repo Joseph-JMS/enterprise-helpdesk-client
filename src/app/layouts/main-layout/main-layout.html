@@ -1,7 +1,9 @@
-<nav class="navbar navbar-dark bg-dark px-3">
-  <span class="navbar-brand">Enterprise HelpDesk</span>
-</nav>
+<div class="d-flex overflow-hidden">
+  <app-navbar></app-navbar>
 
-<div class="container mt-4">
-  <router-outlet />
+  <div class="flex-grow-1 overflow-auto vh-100 bg-light">
+    <main class="container-fluid p-4">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
 </div>
