@@ -13,8 +13,9 @@ export const dashboardRoutes: Routes = [
                 component: UserDashboard
             },
             {
-                // TODO
-            }
+                path: 'tickets',
+                loadChildren: () => import('../tickets/ticket.routes'),
+            },
         ],
     }
 ]
