@@ -3,11 +3,11 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
     {
         path: 'auth',
-        loadChildren: ()=>import('./auth/auth.routes'),
+        loadChildren: ()=>import('./features/auth/auth.routes'),
     },
     {
         path: '',
-        loadChildren: () => import('./dashboard/dashboard.routes'), 
+        loadChildren: () => import('./features/dashboard/dashboard.routes'), 
     },
     {
         path: '**',
