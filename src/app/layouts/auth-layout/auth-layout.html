@@ -1,1 +1,38 @@
-<router-outlet />
+<div class="container-fluid vh-100 bg-light">
+  <div class="row h-100">
+
+    <!-- COLUMNA IZQUIERDA (BRANDING) -->
+    <div class="col-md-6 d-none d-md-flex
+                bg-dark bg-gradient text-white
+                align-items-center justify-content-center">
+
+      <div class="text-center px-5">
+        <img
+          src="assets/images/logo-empresa.png"
+          alt="Logo Empresa"
+          class="img-fluid mb-4"
+          style="max-width: 180px;"
+        />
+
+        <h2 class="fw-bold mb-3">Enterprise HelpDesk</h2>
+        <p class="opacity-75 fs-6">
+          Plataforma corporativa para la gestión eficiente de incidencias
+        </p>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA (LOGIN) -->
+    <div class="col-12 col-md-6
+                d-flex align-items-center justify-content-center">
+
+      <!-- CARD DEL FORMULARIO -->
+      <div class="card shadow-sm border-0 w-100 mx-4" style="max-width: 400px;">
+        <div class="card-body p-4 p-md-5">
+            <router-outlet />
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
