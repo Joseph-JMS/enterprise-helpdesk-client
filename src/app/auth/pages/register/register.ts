@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { RouterLink } from "@angular/router";
 
 @Component({
-  selector: 'auth-login',
+  selector: 'auth-register',
   imports: [RouterLink],
-  templateUrl: './login.html',
+  templateUrl: './register.html',
 })
-export class Login { }
+export class Register { }
