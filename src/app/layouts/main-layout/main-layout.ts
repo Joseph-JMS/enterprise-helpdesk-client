@@ -7,4 +7,4 @@ import { Navbar } from "../../shared/components/navbar/navbar";
   imports: [RouterOutlet, Navbar],
   templateUrl: './main-layout.html',
 })
-export class MainLayout { }
+export default class MainLayout { }
