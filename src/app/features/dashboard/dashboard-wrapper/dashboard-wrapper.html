@@ -6,7 +6,7 @@
     } 
     @else if (authService.hasRole('ROLE_TECHNICIAN')) {
         @defer (on immediate) {
-            <tech-dashboard />
+            <technician-dashboard />
         }
     } 
     @else {

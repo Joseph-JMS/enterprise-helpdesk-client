@@ -17,7 +17,7 @@ export const routes: Routes = [
             },
             {
                 path: 'tickets',
-                loadChildren: () => import('./features/technician/technician.routes'),
+                loadChildren: () => import('./features/tickets/ticket.routes'),
             },
             {
                 path: 'users',
