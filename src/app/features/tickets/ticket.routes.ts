@@ -19,6 +19,11 @@ export const ticketRoutes: Routes = [
                 path: ':id',
                 component: TicketDetail,
             },
+            {
+                path: '',
+                redirectTo: '',
+                pathMatch: 'full'
+            }
             
         ],
     },

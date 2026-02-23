@@ -5,18 +5,20 @@ import { Register } from './pages/register/register';
 export const authRoutes: Routes = [
     {
         path: '',
+        loadComponent: () => import('../../layouts/auth-layout/auth-layout'),
         children: [
             {
                 path: 'login',
-                component: Login
+                loadComponent: () => import('./pages/login/login').then(m=>m.Login)
             },
             {
                 path: 'register',
-                component: Register
+                loadComponent: () => import('./pages/register/register').then(m=>m.Register)
             },
             {
-                path: '**',
-                redirectTo: 'login'
+                path: '',
+                redirectTo: 'login',
+                pathMatch: 'full'
             }
         ]
     }

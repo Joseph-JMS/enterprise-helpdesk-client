@@ -1,31 +1,37 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
     {
         path: 'auth',
-        loadComponent: ()=>import('./layouts/auth-layout/auth-layout'),
         loadChildren: ()=>import('./features/auth/auth.routes'),
     },
     {
         path: '',
         loadComponent: ()=>import('./layouts/main-layout/main-layout'),
+        canActivate: [authGuard],
         children: [
             {
-                path: 'admin',
-                loadChildren: () => import('./features/admin/admin.routes'),
-            },
-            {
-                path: 'technician',
-                loadChildren: () => import('./features/technician/technician.routes'),
-            },
-            {
-                path: 'user',
-                loadChildren: () => import('./features/admin/admin.routes'),
+                path: 'dashboard',
+                loadComponent: () => import('./features/dashboard/dashboard-wrapper/dashboard-wrapper').then(m=>m.DashboardWrapper),
             },
             {
                 path: 'tickets',
+                loadChildren: () => import('./features/technician/technician.routes'),
+            },
+            {
+                path: 'users',
+                loadChildren: () => import('./features/admin/admin.routes'),
+            },
+            {
+                path: 'technicians',
                 loadChildren: () => import('./features/tickets/ticket.routes'),
             },
+            {
+                path: '',
+                redirectTo: 'dashboard',
+                pathMatch: 'full'
+            }
         ] 
     },
     {

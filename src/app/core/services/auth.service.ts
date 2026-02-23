@@ -3,17 +3,18 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { LoginResponse, RegisterRequest } from '../interfaces/auth.interface';
 import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
     
     private http = inject(HttpClient);
-    private API_URL = `${environment.baseUrl}/auth`;
+    private router = inject(Router);
+    private readonly API_URL = `${environment.baseUrl}/auth`;
 
-    // Signal para manejar el estado del usuario de forma reactiva
+    // manejo del estado del usuario de forma reactiva
     #authState = signal<LoginResponse | null>(null);
 
-    // Exponemos signals de lectura
     currentUser = computed(() => this.#authState());
     isLoggedIn = computed(() => !!this.#authState());
 
@@ -23,14 +24,13 @@ export class AuthService {
 
     private checkToken() {
         const token = localStorage.getItem('token');
-        if (token) {
-        // Decodificamos el payload para recuperar roles y username sin pegarle al back
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        this.#authState.set({
-            token,
-            username: payload.sub,
-            roles: payload.authorities // Asegúrate que coincida con el claim de Java
-        });
+        if (!token) return;
+        
+        const data = this.decodeToken(token);
+        if (data) {
+            this.#authState.set(data);
+        } else {
+            this.logout();
         }
     }
 
@@ -38,14 +38,8 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
             tap(res => {
                 localStorage.setItem('token', res.token);
-
-                const payload = JSON.parse(atob(res.token.split('.')[1]));
-
-                this.#authState.set({
-                    token: res.token,
-                    username: res.username,
-                    roles: payload.authorities,
-                });
+                const decoded = this.decodeToken(res.token);
+                this.#authState.set(decoded);
             })
         );
     }
@@ -57,11 +51,32 @@ export class AuthService {
     logout() {
         localStorage.removeItem('token');
         this.#authState.set(null);
-        window.location.href = '/auth/login'; // Recarga para limpiar estados de memoria
+        this.router.navigate(['/auth/login']);
     }
 
     getUserRoles(): string[] {
         return this.#authState()?.roles || [];
+    }
+
+    hasRole(role: string): boolean {
+        const user = this.currentUser();
+        return user ? user.roles.includes(role) : false;
+    }
+
+    private decodeToken(token: string): LoginResponse|null {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const roles = (payload.authorities as string[]).filter(r => r.startsWith('ROLE_'));
+
+            return {
+                token,
+                username: payload.sub,
+                roles: roles
+            };
+        } catch (e) {
+            console.error('Error decodificando el token', e);
+            return null;
+        }
     }
     
 }
