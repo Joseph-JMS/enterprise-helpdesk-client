@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../../core/services/auth.service';
 import { TechnicianDashboard } from "../technician-dashboard/technician-dashboard";
 import { UserDashboard } from "../user-dashboard/user-dashboard";
 import { AdminDashboard } from '../admin-dashboard/admin-dashboard';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard-wrapper',

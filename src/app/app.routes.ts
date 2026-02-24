@@ -24,10 +24,6 @@ export const routes: Routes = [
                 loadChildren: () => import('./features/admin/admin.routes'),
             },
             {
-                path: 'technicians',
-                loadChildren: () => import('./features/tickets/ticket.routes'),
-            },
-            {
                 path: 'reports',
                 loadChildren: () => import('./features/reports/reports.routes'),
             },

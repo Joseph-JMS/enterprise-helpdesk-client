@@ -15,6 +15,11 @@ export const reportsRoutes: Routes = [
             {
                 path: 'categories',
                 loadComponent: () => import('./pages/category-report/category-report').then(m=>m.CategoryReport),
+            },
+            {
+                path: '',
+                redirectTo: 'performance',
+                pathMatch: 'full',
             }
         ]
     }
