@@ -1,0 +1,23 @@
+import { Routes } from '@angular/router';
+
+export const reportsRoutes: Routes = [
+    {   
+        path: '',
+        children: [
+            {
+                path: 'performance',
+                loadComponent: () => import('./pages/performance-report/performance-report').then(m=>m.PerformanceReport),
+            },
+            {
+                path: 'sla',
+                loadComponent: () => import('./pages/sla-report/sla-report').then(m=>m.SlaReport),
+            },
+            {
+                path: 'categories',
+                loadComponent: () => import('./pages/category-report/category-report').then(m=>m.CategoryReport),
+            }
+        ]
+    }
+];
+
+export default reportsRoutes;

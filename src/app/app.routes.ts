@@ -13,19 +13,23 @@ export const routes: Routes = [
         children: [
             {
                 path: 'dashboard',
-                loadComponent: () => import('./features/dashboard/dashboard-wrapper/dashboard-wrapper').then(m=>m.DashboardWrapper),
+                loadChildren: () => import('./features/dashboard/dashboard.routes'),
             },
             {
                 path: 'tickets',
                 loadChildren: () => import('./features/tickets/ticket.routes'),
             },
             {
-                path: 'users',
+                path: 'admin',
                 loadChildren: () => import('./features/admin/admin.routes'),
             },
             {
                 path: 'technicians',
                 loadChildren: () => import('./features/tickets/ticket.routes'),
+            },
+            {
+                path: 'reports',
+                loadChildren: () => import('./features/reports/reports.routes'),
             },
             {
                 path: '',

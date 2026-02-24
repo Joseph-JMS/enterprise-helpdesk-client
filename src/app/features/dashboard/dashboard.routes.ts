@@ -1,10 +1,10 @@
 import { Routes } from "@angular/router";
 
-export const ticketRoutes: Routes = [
+export const dashboardRoutes: Routes = [
     {
         path: '',
-        loadComponent: () => import('./dashboard-wrapper/dashboard-wrapper').then(m=>m.DashboardWrapper),
+        loadComponent: () => import('./pages/dashboard-wrapper/dashboard-wrapper').then(m=>m.DashboardWrapper),
     }
 ];
 
-export default ticketRoutes;
+export default dashboardRoutes;
