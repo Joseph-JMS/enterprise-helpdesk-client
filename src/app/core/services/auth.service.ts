@@ -1,82 +1,115 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { LoginResponse, RegisterRequest } from '../interfaces/auth.interface';
-import { Observable, tap } from 'rxjs';
+import { AuthResponse, AuthUser, LoginRequest, RegisterRequest } from '../interfaces/auth.interface';
+import { catchError, finalize, map, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+
+export type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
     
-    private http = inject(HttpClient);
-    private router = inject(Router);
+    private readonly http = inject(HttpClient);
+    private readonly router = inject(Router);
     private readonly API_URL = `${environment.baseUrl}/auth`;
 
-    // manejo del estado del usuario de forma reactiva
-    #authState = signal<LoginResponse | null>(null);
+    #accessToken = signal<string | null>(null);
+    #authUser = signal<AuthUser | null>(null);
+    #status = signal<AuthStatus>('checking');
 
-    currentUser = computed(() => this.#authState());
-    isLoggedIn = computed(() => !!this.#authState());
+    readonly currentUser = this.#authUser.asReadonly();
+    readonly accessToken = this.#accessToken.asReadonly();
+    readonly authStatus = this.#status.asReadonly();
+
+    readonly isLoggedIn = computed(() => this.#status() === 'authenticated');
+    readonly isChecking = computed(() => this.#status() === 'checking');
+    readonly isAdmin = computed(() => this.hasRole('ROLE_ADMIN'));
+    readonly isTechnician = computed(() => this.hasRole('ROLE_TECHNICIAN'))
 
     constructor() {
-        this.checkToken();
+        this.restoreSession();
     }
 
-    private checkToken() {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        
-        const data = this.decodeToken(token);
-        if (data) {
-            this.#authState.set(data);
-        } else {
-            this.logout();
-        }
-    }
-
-    login(credentials: {username: string, password: string}): Observable<LoginResponse> {
-        return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
-            tap(res => {
-                localStorage.setItem('token', res.token);
-                const decoded = this.decodeToken(res.token);
-                this.#authState.set(decoded);
-            })
+    login(credentials: LoginRequest): Observable<void> {
+        return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
+            tap(response => this.handleSuccess(response)),
+            map(() => void 0),
+            catchError(error => this.handleError(error))
         );
     }
 
-    register(data: RegisterRequest) {
-        return this.http.post(`${this.API_URL}/register`, data);
+    register(data: RegisterRequest): Observable<void> {
+        return this.http.post<void>(`${this.API_URL}/register`, data).pipe(
+            catchError(error => this.handleError(error))
+        );
     }
 
-    logout() {
-        localStorage.removeItem('token');
-        this.#authState.set(null);
-        this.router.navigate(['/auth/login']);
+    refresh(): Observable<void> {
+        return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
+            withCredentials: true
+        }).pipe(
+            tap(resposne => this.handleSuccess(resposne)),
+            map(() => void 0),
+            catchError(error => this.handleError(error))
+        );
     }
 
-    getUserRoles(): string[] {
-        return this.#authState()?.roles || [];
+    logout(): void {
+        this.http.post(`${this.API_URL}/logout`, {}, {
+            withCredentials: true
+        }).pipe(
+            finalize(() => {
+                this.clearSession();
+                this.router.navigate(['/auth/login']);
+            })
+        ).subscribe();
     }
+
 
     hasRole(role: string): boolean {
-        const user = this.currentUser();
-        return user ? user.roles.includes(role) : false;
+        return this.#authUser()?.roles.includes(role) ?? false;
     }
 
-    private decodeToken(token: string): LoginResponse|null {
-        try {
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const roles = (payload.authorities as string[]).filter(r => r.startsWith('ROLE_'));
+    hasAnyRole(roles: string[]): boolean {
+        return roles.some(role => this.hasRole(role));
+    }
 
-            return {
-                token,
-                username: payload.sub,
-                roles: roles
-            };
-        } catch (e) {
-            console.error('Error decodificando el token', e);
-            return null;
+    isTokenExpired(): boolean {
+        const user =  this.#authUser();
+        if (!user) return true;
+        return new Date() >= user.expiresAt;
+    }
+
+
+    private restoreSession(): void {
+        this.refresh().subscribe({
+            next: () => this.#status.set('authenticated'),
+            error: () => this.#status.set('not-authenticated')
+        });
+    }
+
+    private handleSuccess(response: AuthResponse): void {
+        this.#accessToken.set(response.accessToken);
+        this.#authUser.set({
+            username: response.username,
+            roles: response.roles,
+            expiresAt: new Date(Date.now() + response.expiresIn * 1000)
+        });
+        this.#status.set('authenticated');
+    }
+
+    private handleError(error: HttpErrorResponse): Observable<never> {
+        if (error.status === 401) {
+            this.clearSession();
         }
+        return throwError(() => error);
+    }
+
+    private clearSession(): void {
+        this.#accessToken.set(null);
+        this.#authUser.set(null);
+        this.#status.set('not-authenticated');
     }
     
 }

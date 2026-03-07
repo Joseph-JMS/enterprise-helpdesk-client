@@ -31,18 +31,11 @@ export class Login {
 
       this.authService.login(data).subscribe({
         next: (res) => {
-          // Lógica de redirección inteligente basada en tus carpetas
-          // if (res.roles.includes('ROLE_ADMIN')) {
-          //   this.router.navigate(['/admin']);
-          // } else if (res.roles.includes('ROLE_TECHNICIAN')) {
-          //   this.router.navigate(['/technician']);
-          // } else {
-          //   this.router.navigate(['/user']);
-          // }
+          this.router.navigate(['/dashboard']);
         }
       });
     }
-}
+  }
 
 
 

@@ -4,22 +4,22 @@
     <div class="h5 mb-0 fw-bold text-uppercase" style="letter-spacing: 1px;">
       HelpDesk <span class="text-primary">Empresa</span>
     </div>
-    <div class="small text-muted border-top border-secondary mt-1 pt-1 text-uppercase" style="font-size: 0.6rem;">
+    <div class="small text-light border-top border-secondary mt-1 pt-1 text-uppercase" style="font-size: 0.6rem;">
       Gestión de Incidentes
     </div>
   </div>
 
   <div class="mb-4 p-3 bg-white bg-opacity-10 border border-secondary border-opacity-25 rounded shadow-sm">
     <div class="small text-light text-uppercase fw-semibold mb-1" style="font-size: 0.65rem;">Sesión iniciada</div>
-    <div class="fw-bold text-truncate">JOSEPH M</div>
+    <div class="fw-bold text-truncate">{{user()?.username}}</div>
     <div class="text-info small fw-bold text-uppercase" style="font-size: 0.6rem;">Administrador</div>
   </div>
 
   <ul class="nav nav-pills flex-column mb-auto">
     <li class="nav-item mb-2">
-      <a routerLink="/" 
-         routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary" 
-         class="nav-link text-white text-uppercase small fw-semibold py-2 rounded-0 border-start border-4 border-transparent">
+      <a routerLink="/dashboard" 
+         routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary"
+         class="nav-link text-white-50 text-uppercase small fw-semibold py-2 rounded-0 border-start border-4 border-transparent">
         Dashboard
       </a>
     </li>
@@ -29,15 +29,7 @@
     </li>
     
     <li class="nav-item mb-1">
-      <a routerLink="/tickets" 
-         routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
-         class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
-        Inicio
-      </a>
-    </li>
-
-    <li class="nav-item mb-1">
-      <a routerLink="/tickets" 
+      <a routerLink="/tickets/my-tickets" 
          routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
          class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
         Mis tickets
@@ -45,36 +37,92 @@
     </li>
 
     <li class="nav-item mb-1">
-      <a routerLink="/tickets/nuevo" 
+      <a routerLink="/tickets/create" 
          routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
          class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
-        Crear Ticket
+        Nuevo Ticket
       </a>
     </li>
 
-    <li class="mt-4 mb-2 ps-3">
-      <small class="text-light text-uppercase fw-bold opacity-50" style="font-size: 0.65rem;">Sistema</small>
-    </li>
+    @if (roles().includes('ROLE_ADMIN') || roles().includes('ROLE_TECHNICIAN')) {
+      <li class="nav-item mb-1">
+        <a routerLink="/tickets/unassigned" 
+            routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+            class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          Tickets sin asignar
+        </a>
+      </li>
+  
+      <li class="nav-item mb-1">
+        <a routerLink="/tickets/assigned" 
+            routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+            class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          Tickets asignados
+        </a>
+      </li>
+    }
 
-    <li class="nav-item mb-1">
-      <a routerLink="/admin/users" 
-         routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
-         class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
-        Usuarios
-      </a>
-    </li>
+    @if (roles().includes('ROLE_ADMIN') || roles().includes('ROLE_TECHNICIAN')) {
+      <li class="mt-4 mb-2 ps-3">
+        <small class="text-light text-uppercase fw-bold opacity-50" style="font-size: 0.65rem;">Admin</small>
+      </li>
+  
+      <li class="nav-item mb-1">
+        <a routerLink="/admin/users" 
+           routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+           class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          Usuarios
+        </a>
+      </li>
+  
+      <li class="nav-item mb-1">
+        <a routerLink="/admin/categories" 
+           routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+           class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          Categorias
+        </a>
+      </li>
+    }
 
-    <li class="nav-item mb-1">
-      <a routerLink="/admin/categories" 
-         routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
-         class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
-        Tecnicos
-      </a>
-    </li>
+    @if (roles().includes('ROLE_ADMIN') || roles().includes('ROLE_TECHNICIAN')) {
+      <li class="mt-4 mb-2 ps-3">
+        <small class="text-light text-uppercase fw-bold opacity-50" style="font-size: 0.65rem;">Reportes</small>
+      </li>
+  
+      <li class="nav-item mb-1">
+        <a routerLink="/reports/performance" 
+          routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+          class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          Desempeño
+        </a>
+      </li>
+  
+      <li class="nav-item mb-1">
+        <a routerLink="/reports/sla" 
+          routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+          class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          SLA
+        </a>
+      </li>
+    }
+
+    @if (roles().includes('ROLE_ADMIN')) {
+      <li class="nav-item mb-1">
+        <a routerLink="/reports/categories" 
+          routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+          class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+          Categorias
+        </a>
+      </li>
+    }
+
   </ul>
 
   <div class="mt-auto pt-3 border-top border-secondary border-opacity-50">
-    <button class="btn btn-link text-danger text-decoration-none text-uppercase fw-bold small p-0 w-100 text-start ps-3">
+    <button 
+      class="btn btn-link text-danger text-decoration-none text-uppercase fw-bold small p-0 w-100 text-start ps-3"
+      (click)="logout()"  
+    >
       Cerrar Sesión
     </button>
   </div>

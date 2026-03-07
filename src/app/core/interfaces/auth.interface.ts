@@ -1,7 +1,19 @@
-export interface LoginResponse {
-  token: string;
+export interface AuthResponse {
+  accessToken: string;
   username: string;
-  roles: string[]; // Los que configuramos en JwtUtils del Back
+  roles: string[];
+  expiresIn: number;
+}
+
+export interface AuthUser {
+  username: string;
+  roles: string[];
+  expiresAt: Date;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
 }
 
 export interface RegisterRequest {
@@ -10,5 +22,5 @@ export interface RegisterRequest {
   email: string;
   firstName: string;
   lastName: string;
-  roles?: string[]; // Opcional según tu lógica de registro
+  roles?: string[];
 }
