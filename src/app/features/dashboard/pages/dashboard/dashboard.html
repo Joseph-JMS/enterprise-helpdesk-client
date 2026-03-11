@@ -1,1 +1,32 @@
-<p>dashboard works!</p>,
+<div class="container-fluid p-4">
+
+    <div class="mb-4">
+        <h4 class="fw-bold">Bienvenido, {{ user()?.username}}</h4>
+        <p class="text-muted">Panel de control</p>
+    </div>
+
+    @switch (userRole()) {
+        @case ('ROLE_ADMIN') {
+            <div class="row g-3">
+                <div class="col-12">
+                    <p class="text-muted">Vista de administrador</p>
+                </div>
+            </div>
+        }
+        @case ('ROLE_TECHNICIAN') {
+            <div class="row g-3">
+                <div class="col-12">
+                    <p class="text-muted">Vista de tecnico</p>
+                </div>
+            </div>
+        }
+        @default {
+            <div class="row g-3">
+                <div class="col-12">
+                    <p class="text-muted">Vista de usuario</p>
+                </div>
+            </div>
+        }
+    }
+
+</div>

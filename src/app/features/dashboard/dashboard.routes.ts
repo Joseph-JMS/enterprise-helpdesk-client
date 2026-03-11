@@ -3,7 +3,7 @@ import { Routes } from "@angular/router";
 export const dashboardRoutes: Routes = [
     {
         path: '',
-        loadComponent: () => import('./pages/dashboard-wrapper/dashboard-wrapper').then(m=>m.DashboardWrapper),
+        loadComponent: () => import('./pages/dashboard/dashboard').then(m=>m.Dashboard),
     }
 ];
 
