@@ -1,32 +1,177 @@
 <div class="container-fluid p-4">
 
-    <div class="mb-4">
-        <h4 class="fw-bold">Bienvenido, {{ user()?.username}}</h4>
-        <p class="text-muted">Panel de control</p>
+  <div class="mb-4">
+    <h4 class="fw-bold">Bienvenido, {{ user()?.username }}</h4>
+    <p class="text-muted mb-0">Panel de control</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
     </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else {
 
     @switch (userRole()) {
-        @case ('ROLE_ADMIN') {
-            <div class="row g-3">
-                <div class="col-12">
-                    <p class="text-muted">Vista de administrador</p>
-                </div>
+      @case ('ROLE_ADMIN') {
+        <div class="row g-3">
+
+          <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Total tickets</p>
+                <h3 class="fw-bold">{{ summary()?.totalTickets }}</h3>
+              </div>
             </div>
-        }
-        @case ('ROLE_TECHNICIAN') {
-            <div class="row g-3">
-                <div class="col-12">
-                    <p class="text-muted">Vista de tecnico</p>
-                </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm border-start border-4 border-warning">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Abiertos</p>
+                <h3 class="fw-bold text-warning">{{ summary()?.open }}</h3>
+              </div>
             </div>
-        }
-        @default {
-            <div class="row g-3">
-                <div class="col-12">
-                    <p class="text-muted">Vista de usuario</p>
-                </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm border-start border-4 border-info">
+              <div class="card-body">
+                <p class="text-muted small mb-1">En progreso</p>
+                <h3 class="fw-bold text-info">{{ summary()?.inProgress }}</h3>
+              </div>
             </div>
-        }
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm border-start border-4 border-success">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Resueltos</p>
+                <h3 class="fw-bold text-success">{{ summary()?.resolved }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm border-start border-4 border-secondary">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Cerrados</p>
+                <h3 class="fw-bold text-secondary">{{ summary()?.closed }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm border-start border-4 border-danger">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Sin asignar</p>
+                <h3 class="fw-bold text-danger">{{ unassignedCount() }}</h3>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      @case ('ROLE_TECHNICIAN') {
+        <div class="row g-3">
+
+          <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm border-start border-4 border-primary">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Tickets asignados</p>
+                <h3 class="fw-bold text-primary">{{ myPerformance()?.assignedTickets }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="card border-0 shadow-sm border-start border-4 border-success">
+              <div class="card-body">
+                <p class="text-muted small mb-1">Tickets resueltos</p>
+                <h3 class="fw-bold text-success">{{ myPerformance()?.resolvedTickets }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 mt-2">
+            <h6 class="fw-bold mb-3">Mis tickets asignados</h6>
+            @if (assignedTickets().length === 0) {
+            <p class="text-muted">No tienes tickets asignados.</p>
+            } @else {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (ticket of assignedTickets(); track ticket.id) {
+                  <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td>{{ ticket.priority }}</td>
+                    <td>{{ ticket.status }}</td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            }
+          </div>
+
+        </div>
+      }
+
+      @default {
+        <div class="row g-3">
+
+          <div class="col-12">
+            <h6 class="fw-bold mb-3">Mis tickets recientes</h6>
+            @if (myTickets().length === 0) {
+            <p class="text-muted">No tienes tickets abiertos.</p>
+            } @else {
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Título</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (ticket of myTickets(); track ticket.id) {
+                  <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td>{{ ticket.priority }}</td>
+                    <td>{{ ticket.status }}</td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            }
+          </div>
+
+          <div class="col-12">
+            <a routerLink="/tickets/create" class="btn btn-primary">
+              Crear nuevo ticket
+            </a>
+          </div>
+
+        </div>
+      }
+
     }
+
+  }
 
 </div>
