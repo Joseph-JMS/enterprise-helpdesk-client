@@ -1,8 +1,75 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { TicketCardSkeleton } from "../../../../shared/components/ticket-card-skeleton/ticket-card-skeleton";
+import { Pagination } from "../../../../shared/components/pagination/pagination";
+import { TicketResponse } from '../../../../core/interfaces/ticket.interface';
+import { TicketService } from '../../../../core/services/ticket.service';
+import { Router } from '@angular/router';
+import { TicketCard } from "../../components/ticket-card/ticket-card";
 
 @Component({
   selector: 'app-unassigned-tickets',
-  imports: [],
+  imports: [TicketCardSkeleton, Pagination, TicketCard],
   templateUrl: './unassigned-tickets.html',
 })
-export class UnassignedTickets { }
+export class UnassignedTickets {
+
+    private readonly ticketService = inject(TicketService);
+  private readonly router = inject(Router);
+
+  tickets = signal<TicketResponse[]>([]);
+  isLoading = signal<boolean>(true);
+  isProcessing = signal<boolean>(false);
+  errorMessage = signal<string | null>(null);
+  currentPage = signal<number>(0);
+  totalPages = signal<number>(0);
+  totalElements = signal<number>(0);
+  pageSize = 10;
+
+  ngOnInit() {
+    this.loadTickets();
+  }
+
+  loadTickets(page: number = 0) {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    this.ticketService.getUnassigned(page, this.pageSize).subscribe({
+      next: (data) => {
+        this.tickets.set(data.content);
+        this.currentPage.set(data.page.number);
+        this.totalPages.set(data.page.totalPages);
+        this.totalElements.set(data.page.totalElements);
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Error al cargar los tickets');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  goToPage(page: number) {
+    if (page >= 0 && page < this.totalPages()) {
+      this.loadTickets(page);
+    }
+  }
+
+  goToDetail(id: number) {
+    this.router.navigate(['/tickets', id]);
+  }
+
+  assignToMe(id: number) {
+    this.isProcessing.set(true);
+    this.ticketService.assign(id).subscribe({
+      next: () => {
+        this.isProcessing.set(false);
+        this.loadTickets(this.currentPage());
+      },
+      error: () => {
+        this.errorMessage.set('Error al asignar el ticket');
+        this.isProcessing.set(false);
+      }
+    });
+  }
+
+}
