@@ -1,1 +1,160 @@
-<p>ticket-detail works!</p>,
+<div class="container py-4">
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-muted small mt-2">Cargando ticket...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else if (ticket()) {
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <span class="text-muted small">TK-{{ ticket()!.id }}</span>
+        <h4 class="fw-bold mb-0">{{ ticket()!.title }}</h4>
+      </div>
+      <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">
+        Volver
+      </button>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-danger">{{ errorMessage() }}</div>
+    }
+
+    <div class="row g-4">
+
+      <!-- Columna principal -->
+      <div class="col-12 col-lg-8">
+
+        <!-- Descripción -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Descripción</h6>
+            <p class="text-muted mb-0">{{ ticket()!.description }}</p>
+          </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Historial de estados</h6>
+            @if (history().length === 0) {
+              <p class="text-muted small mb-0">Sin cambios de estado aún.</p>
+            } @else {
+              <ticket-history [history]="history()" />
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Columna lateral -->
+      <div class="col-12 col-lg-4">
+
+        <!-- Info -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Información</h6>
+
+            <div class="mb-3">
+              <small class="text-muted fw-bold d-block">ESTADO</small>
+              <span [class]="ticket()!.status | statusClass">
+                {{ ticket()!.status | statusLabel }}
+              </span>
+            </div>
+
+            <div class="mb-3">
+              <small class="text-muted fw-bold d-block">PRIORIDAD</small>
+              <span [class]="ticket()!.priority | priorityClass">
+                {{ ticket()!.priority | priorityLabel }}
+              </span>
+            </div>
+
+            <div class="mb-3">
+              <small class="text-muted fw-bold d-block">CATEGORÍA</small>
+              <span class="small">{{ ticket()!.category.name }}</span>
+            </div>
+
+            <div class="mb-3">
+              <small class="text-muted fw-bold d-block">SOLICITANTE</small>
+              <span class="small">{{ ticket()!.createdBy }}</span>
+            </div>
+
+            <div class="mb-3">
+              <small class="text-muted fw-bold d-block">ASIGNADO A</small>
+              <span class="small">{{ ticket()!.assignedTo ?? 'Sin asignar' }}</span>
+            </div>
+
+            <div class="mb-3">
+              <small class="text-muted fw-bold d-block">CREADO</small>
+              <span class="small">{{ ticket()!.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+
+            @if (ticket()!.resolvedAt) {
+              <div class="mb-3">
+                <small class="text-muted fw-bold d-block">RESUELTO</small>
+                <span class="small">{{ ticket()!.resolvedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            }
+
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        @if (isAdminOrTechnician() || ticket()!.createdBy === currentUser()?.username) {
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <h6 class="fw-bold mb-3">Acciones</h6>
+              <div class="d-flex flex-column gap-2">
+
+                @if (isAdminOrTechnician() && ticket()!.status === 'OPEN' && !ticket()!.assignedTo) {
+                  <button
+                    class="btn btn-primary btn-sm fw-bold"
+                    [disabled]="isProcessing()"
+                    (click)="assignToMe()">
+                    Asignarme
+                  </button>
+                }
+
+                @if (isAdminOrTechnician() && ticket()!.status === 'IN_PROGRESS') {
+                  <button
+                    class="btn btn-success btn-sm fw-bold"
+                    [disabled]="isProcessing()"
+                    (click)="changeStatus('RESOLVED')">
+                    Marcar como resuelto
+                  </button>
+                }
+
+                @if (isAdmin() && ticket()!.status === 'RESOLVED') {
+                  <button
+                    class="btn btn-secondary btn-sm fw-bold"
+                    [disabled]="isProcessing()"
+                    (click)="changeStatus('CLOSED')">
+                    Cerrar ticket
+                  </button>
+                }
+
+                @if (ticket()!.createdBy === currentUser()?.username && ticket()!.status === 'OPEN') {
+                  <button
+                    class="btn btn-outline-danger btn-sm fw-bold"
+                    [disabled]="isProcessing()"
+                    (click)="cancelTicket()">
+                    Cancelar ticket
+                  </button>
+                }
+
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+    </div>
+
+  }
+
+</div>

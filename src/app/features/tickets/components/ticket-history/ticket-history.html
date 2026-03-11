@@ -1,1 +1,35 @@
-<p>ticket-history works!</p>,
+<div class="d-flex flex-column gap-3">
+  @for (item of history(); track item.id) {
+    <div class="d-flex gap-3">
+
+      <!-- Línea vertical -->
+      <div class="d-flex flex-column align-items-center">
+        <div class="rounded-circle bg-primary"
+             style="width: 10px; height: 10px; margin-top: 4px; flex-shrink: 0;">
+        </div>
+        @if (!$last) {
+          <div class="bg-secondary bg-opacity-25"
+               style="width: 2px; flex-grow: 1; min-height: 24px;">
+          </div>
+        }
+      </div>
+
+      <!-- Contenido -->
+      <div class="pb-3">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span [class]="item.previousStatus | statusClass">
+            {{ item.previousStatus | statusLabel }}
+          </span>
+          <span class="text-muted small">→</span>
+          <span [class]="item.newStatus | statusClass">
+            {{ item.newStatus | statusLabel }}
+          </span>
+        </div>
+        <small class="text-muted">
+          {{ item.changedBy }} · {{ item.changedAt | date:'dd/MM/yyyy HH:mm' }}
+        </small>
+      </div>
+
+    </div>
+  }
+</div>
