@@ -5,6 +5,10 @@ export const reportsRoutes: Routes = [
         path: '',
         children: [
             {
+                path: 'summary',
+                loadComponent: () => import('./pages/summary-report/summary-report').then(m=>m.SummaryReport),
+            },
+            {
                 path: 'performance',
                 loadComponent: () => import('./pages/performance-report/performance-report').then(m=>m.PerformanceReport),
             },

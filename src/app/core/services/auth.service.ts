@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { AuthResponse, AuthUser, LoginRequest, RegisterRequest } from '../interfaces/auth.interface';
-import { catchError, finalize, map, Observable, tap, throwError } from 'rxjs';
+import { catchError, finalize, firstValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 
 export type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
@@ -26,13 +26,16 @@ export class AuthService {
     readonly isChecking = computed(() => this.#status() === 'checking');
     readonly isAdmin = computed(() => this.hasRole('ROLE_ADMIN'));
     readonly isTechnician = computed(() => this.hasRole('ROLE_TECHNICIAN'))
+    readonly isAdminOrTechnician = computed(() =>
+        this.hasAnyRole(['ROLE_ADMIN', 'ROLE_TECHNICIAN'])
+    );
 
-    constructor() {
-        this.restoreSession();
-    }
+    constructor() {}
 
     login(credentials: LoginRequest): Observable<void> {
-        return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
+        return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials, {
+            withCredentials: true
+        }).pipe(
             tap(response => this.handleSuccess(response)),
             map(() => void 0),
             catchError(error => this.handleError(error))
@@ -49,21 +52,23 @@ export class AuthService {
         return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
             withCredentials: true
         }).pipe(
-            tap(resposne => this.handleSuccess(resposne)),
+            tap(response => this.handleSuccess(response)),
             map(() => void 0),
-            catchError(error => this.handleError(error))
+            catchError(error => throwError(() => error))
         );
     }
 
-    logout(): void {
-        this.http.post(`${this.API_URL}/logout`, {}, {
+    logout(): Observable<void> {
+        return this.http.post<void>(`${this.API_URL}/logout`, {}, {
             withCredentials: true
         }).pipe(
             finalize(() => {
                 this.clearSession();
                 this.router.navigate(['/auth/login']);
-            })
-        ).subscribe();
+            }),
+            map(() => void 0),
+            catchError(() => of(void 0))
+        );
     }
 
 
@@ -82,11 +87,15 @@ export class AuthService {
     }
 
 
-    private restoreSession(): void {
-        this.refresh().subscribe({
-            next: () => this.#status.set('authenticated'),
-            error: () => this.#status.set('not-authenticated')
-        });
+    restoreSession(): Promise<void> {
+        return firstValueFrom(
+            this.refresh().pipe(
+                catchError(() => {
+                    this.#status.set('not-authenticated');
+                    return of(void 0);
+                })
+            )
+        )
     }
 
     private handleSuccess(response: AuthResponse): void {
@@ -94,7 +103,7 @@ export class AuthService {
         this.#authUser.set({
             username: response.username,
             roles: response.roles,
-            expiresAt: new Date(Date.now() + response.expiresIn * 1000)
+            expiresAt: new Date(Date.now() + (response.expiresIn - 30) * 1000)
         });
         this.#status.set('authenticated');
     }

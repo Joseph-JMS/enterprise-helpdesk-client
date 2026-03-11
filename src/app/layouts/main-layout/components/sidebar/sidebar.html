@@ -12,7 +12,7 @@
   <div class="mb-4 p-3 bg-white bg-opacity-10 border border-secondary border-opacity-25 rounded shadow-sm">
     <div class="small text-light text-uppercase fw-semibold mb-1" style="font-size: 0.65rem;">Sesión iniciada</div>
     <div class="fw-bold text-truncate">{{user()?.username}}</div>
-    <div class="text-info small fw-bold text-uppercase" style="font-size: 0.6rem;">Administrador</div>
+    <div class="text-info small fw-bold text-uppercase" style="font-size: 0.6rem;">{{roleLabel()}}</div>
   </div>
 
   <ul class="nav nav-pills flex-column mb-auto">
@@ -44,7 +44,7 @@
       </a>
     </li>
 
-    @if (roles().includes('ROLE_ADMIN') || roles().includes('ROLE_TECHNICIAN')) {
+    @if (isAdminOrTechnician()) {
       <li class="nav-item mb-1">
         <a routerLink="/tickets/unassigned" 
             routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
@@ -62,7 +62,7 @@
       </li>
     }
 
-    @if (roles().includes('ROLE_ADMIN') || roles().includes('ROLE_TECHNICIAN')) {
+    @if (isAdmin()) {
       <li class="mt-4 mb-2 ps-3">
         <small class="text-light text-uppercase fw-bold opacity-50" style="font-size: 0.65rem;">Admin</small>
       </li>
@@ -84,11 +84,21 @@
       </li>
     }
 
-    @if (roles().includes('ROLE_ADMIN') || roles().includes('ROLE_TECHNICIAN')) {
+    @if (isAdminOrTechnician()) {
       <li class="mt-4 mb-2 ps-3">
         <small class="text-light text-uppercase fw-bold opacity-50" style="font-size: 0.65rem;">Reportes</small>
       </li>
-  
+      
+      @if (isAdmin()) {
+        <li class="nav-item mb-1">
+          <a routerLink="/reports/summary" 
+            routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+            class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+            Resumen general
+          </a>
+        </li>
+      }
+
       <li class="nav-item mb-1">
         <a routerLink="/reports/performance" 
           routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
@@ -104,17 +114,18 @@
           SLA
         </a>
       </li>
+
+      @if (isAdmin()) {
+        <li class="nav-item mb-1">
+          <a routerLink="/reports/categories" 
+            routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
+            class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
+            Categorias
+          </a>
+        </li>
+      }
     }
 
-    @if (roles().includes('ROLE_ADMIN')) {
-      <li class="nav-item mb-1">
-        <a routerLink="/reports/categories" 
-          routerLinkActive="active bg-primary bg-opacity-10 border-start border-4 border-primary text-white" 
-          class="nav-link text-white-50 small py-2 rounded-0 border-start border-4 border-transparent">
-          Categorias
-        </a>
-      </li>
-    }
 
   </ul>
 

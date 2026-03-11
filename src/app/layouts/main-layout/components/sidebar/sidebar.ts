@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { AuthService } from '../../../../core/services/auth.service';
 
@@ -9,13 +9,21 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class Sidebar {
 
-  authService = inject(AuthService);
+  private readonly authService = inject(AuthService);
   
-  protected user = signal(this.authService.currentUser());
-  protected roles = signal(this.authService.getUserRoles());
+  protected readonly user = this.authService.currentUser;
+  protected readonly isAdmin = this.authService.isAdmin;
+  protected readonly isTechnician = this.authService.isTechnician;
+  protected readonly isAdminOrTechnician = this.authService.isAdminOrTechnician;
+
+  protected readonly roleLabel = computed(() => {
+    if (this.authService.isAdmin()) return 'Administrador';
+    if (this.authService.isTechnician()) return 'Tecnico';
+    return 'Usuario';
+  })
 
   logout() {
-    this.authService.logout();
+    this.authService.logout().subscribe();
   }
 
 }

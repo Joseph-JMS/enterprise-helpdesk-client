@@ -2,6 +2,14 @@
   Iniciar sesión
 </h4>
 
+@if (successMessage()) {
+  <div class="alert alert-success">{{successMessage()}}</div>
+}
+
+@if (errorMessage()) {
+  <div class="alert alert-success">{{errorMessage()}}</div>
+}
+
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <!-- Usuario -->
   <div class="mb-3">
@@ -12,6 +20,9 @@
       placeholder="usuario@empresa.com"
       formControlName="username"
     />
+    @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+      <small class="text-danger">El usuario es obligatorio</small>
+    }
   </div>
 
   <!-- Contraseña -->
@@ -23,10 +34,21 @@
       placeholder="••••••••"
       formControlName="password"
     />
+    @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+      <small class="text-danger">La contraseña es obligatoria</small>
+    }
   </div>
 
-  <button class="btn btn-secondary w-100 py-2">
-    Ingresar
+  <button 
+    type="submit"
+    [disabled]="isLoading()"
+    class="btn btn-secondary w-100 py-2"
+  >
+    @if (isLoading()) {
+      Iniciando sesion...
+    } @else {
+      Ingresar
+    }
   </button>
 
   <div class="text-center mt-3">
