@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { TicketDetail } from './pages/ticket-detail/ticket-detail';
 import { MyTickets } from './pages/my-tickets/my-tickets';
-import { TicketForm } from './pages/ticket-form/ticket-form';
+import { TicketCreate } from './pages/ticket-create/ticket-create';
 import { UnassignedTickets } from './pages/unassigned-tickets/unassigned-tickets';
 import { AssignedTickets } from './pages/assigned-tickets/assigned-tickets';
 
@@ -15,7 +15,7 @@ export const ticketRoutes: Routes = [
             },
             {
                 path: 'create',
-                component: TicketForm,
+                component: TicketCreate,
             },
             {
                 path: 'unassigned',
