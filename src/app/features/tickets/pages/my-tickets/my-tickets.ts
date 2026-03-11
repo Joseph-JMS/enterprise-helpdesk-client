@@ -1,15 +1,17 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { TicketCard } from "../../components/ticket-card/ticket-card";
 import { TicketService } from '../../../../core/services/ticket.service';
 import { Router } from '@angular/router';
 import { TicketResponse } from '../../../../core/interfaces/ticket.interface';
+import { Pagination } from "../../../../shared/components/pagination/pagination";
+import { TicketCardSkeleton } from "../../../../shared/components/ticket-card-skeleton/ticket-card-skeleton";
 
 @Component({
   selector: 'app-my-tickets',
-  imports: [TicketCard],
+  imports: [TicketCard, Pagination, TicketCardSkeleton],
   templateUrl: './my-tickets.html',
 })
-export class MyTickets {
+export class MyTickets implements OnInit{
 
   private readonly ticketService = inject(TicketService);
   private readonly router = inject(Router);
@@ -21,7 +23,7 @@ export class MyTickets {
   currentPage = signal<number>(0);
   totalPages = signal<number>(0);
   totalElements = signal<number>(0);
-  pageSize = 10;
+  pageSize = 9;
 
   ngOnInit() {
     this.loadTickets();
