@@ -1,0 +1,28 @@
+@if (totalPages() > 1) {
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    <small class="text-muted">
+      Página {{ currentPage() + 1 }} de {{ totalPages() }}
+    </small>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="currentPage() === 0">
+          <button class="page-link" (click)="goToPage(currentPage() - 1)">
+            Anterior
+          </button>
+        </li>
+        @for (page of getPages(); track page) {
+          <li class="page-item" [class.active]="page === currentPage()">
+            <button class="page-link" (click)="goToPage(page)">
+              {{ page + 1 }}
+            </button>
+          </li>
+        }
+        <li class="page-item" [class.disabled]="currentPage() === totalPages() - 1">
+          <button class="page-link" (click)="goToPage(currentPage() + 1)">
+            Siguiente
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+}
