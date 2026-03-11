@@ -1,17 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { TicketCard } from "../../components/ticket-card/ticket-card";
 import { TicketService } from '../../../../core/services/ticket.service';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { TicketResponse } from '../../../../core/interfaces/ticket.interface';
-import { StatusLabelPipe } from '../../../../core/pipes/status-label.pipe';
-import { StatusClassPipe } from '../../../../core/pipes/status-class.pipe';
-import { PriorityLabelPipe } from '../../../../core/pipes/priority-label.pipe';
-import { PriorityClassPipe } from '../../../../core/pipes/priority-class.pipe';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-my-tickets',
-  imports: [TicketCard, RouterLink, StatusLabelPipe, StatusClassPipe, PriorityLabelPipe, PriorityClassPipe, DatePipe],
+  imports: [TicketCard],
   templateUrl: './my-tickets.html',
 })
 export class MyTickets {

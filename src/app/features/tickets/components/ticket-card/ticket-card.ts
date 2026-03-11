@@ -1,5 +1,4 @@
 import { Component, input, output } from '@angular/core';
-import { RouterLink } from "@angular/router";
 import { TicketResponse } from '../../../../core/interfaces/ticket.interface';
 import { StatusLabelPipe } from '../../../../core/pipes/status-label.pipe';
 import { StatusClassPipe } from '../../../../core/pipes/status-class.pipe';
