@@ -1,1 +1,40 @@
-<p>assigned-tickets works!</p>,
+<div class="container-fluid py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">Tickets Asignados</h4>
+    <p class="text-muted small mb-0">{{ totalElements() }} tickets asignados</p>
+  </div>
+
+  @if (isLoading()) {
+    <ticket-card-skeleton></ticket-card-skeleton>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else if (tickets().length === 0) {
+    <div class="text-center py-5">
+      <p class="text-muted mb-0">No tienes tickets asignados.</p>
+    </div>
+  } @else {
+
+    <div class="row g-4">
+      @for (ticket of tickets(); track ticket.id) {
+        <div class="col-12 col-lg-6 col-xl-4 col-xxl-3">
+          <ticket-card [ticket]="ticket">
+            <button
+              class="btn btn-outline-secondary btn-sm w-100 fw-bold"
+              (click)="goToDetail(ticket.id)">
+              Ver detalle
+            </button>
+          </ticket-card>
+        </div>
+      }
+    </div>
+
+    <app-pagination 
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="goToPage($event)"
+    />
+
+  }
+
+</div>
