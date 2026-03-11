@@ -1,75 +1,89 @@
-<div class="container-fluid py-5">
-  <div class="row justify-content-center">
-    <div class="col-12 col-xl-8">
-      
-      <div class="mb-5">
-        <h2 class="h4 fw-bold text-uppercase border-bottom pb-3" style="letter-spacing: 1px;">
-          Nueva Solicitud de <span class="text-primary">Soporte</span>
-        </h2>
-        <p class="text-muted small">Por favor, detalle el inconveniente para que nuestro equipo técnico pueda ayudarle a la brevedad.</p>
-      </div>
+<div class="container py-4" style="max-width: 700px">
+  <div class="mb-4">
+    <h4 class="fw-bold">Nuevo Ticket</h4>
+    <p class="text-muted mb-0">Describe tu incidencia para que podamos ayudarte</p>
+  </div>
 
-      <div class="card shadow-sm border-0 rounded-0">
-        <div class="card-body p-4 p-md-5">
-          <form>
-            
-            <div class="mb-4">
-              <label class="form-label small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Asunto del Problema</label>
-              <input type="text" class="form-control form-control-lg rounded-0 border-2" 
-                     placeholder="Ej. No puedo acceder al correo corporativo">
-            </div>
+  @if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  }
 
-            <div class="row">
-              <div class="col-md-6 mb-4">
-                <label class="form-label small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Categoría</label>
-                <select class="form-select rounded-0 border-2">
-                  <option selected disabled>Seleccione una opción</option>
-                  <option value="TI">Infraestructura TI</option>
-                  <option value="SOFT">Software / Aplicaciones</option>
-                  <option value="HARD">Hardware / Equipos</option>
-                  <option value="ACC">Accesos y Contraseñas</option>
-                </select>
-              </div>
-
-              <div class="col-md-6 mb-4">
-                <label class="form-label small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Urgencia</label>
-                <select class="form-select rounded-0 border-2 border-start-0 border-md-start-2">
-                  <option value="BAJA">Baja - Puedo trabajar con normalidad</option>
-                  <option value="MEDIA" selected>Media - Afecta mis funciones parcialmente</option>
-                  <option value="ALTA">Alta - Trabajo totalmente detenido</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="form-label small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Descripción del Incidente</label>
-              <textarea class="form-control rounded-0 border-2" rows="6" 
-                        placeholder="Describa los pasos para replicar el error o qué mensajes le aparecen..."></textarea>
-            </div>
-
-            <div class="mb-5">
-              <label class="form-label small fw-bold text-uppercase text-muted" style="font-size: 0.7rem;">Capturas o Archivos (Opcional)</label>
-              <div class="border border-2 border-dashed p-4 text-center bg-light rounded-0">
-                <input type="file" class="form-control d-none" id="fileUpload" multiple>
-                <label for="fileUpload" class="mb-0 cursor-pointer text-primary fw-bold small text-uppercase" style="cursor: pointer;">
-                  Haga clic para subir o arrastre archivos aquí
-                </label>
-              </div>
-            </div>
-
-            <div class="d-flex justify-content-end gap-3 pt-3 border-top">
-              <button type="button" class="btn btn-link text-muted text-decoration-none text-uppercase small fw-bold">
-                Cancelar
-              </button>
-              <button type="submit" class="btn btn-primary rounded-0 px-5 py-2 text-uppercase fw-bold shadow-sm">
-                Enviar Ticket
-              </button>
-            </div>
-
-          </form>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()">
+        <!-- Título -->
+        <div class="mb-3">
+          <label class="form-label fw-medium">Título</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Describe brevemente el problema"
+            formControlName="title"
+          />
+          @if (ticketForm.get('title')?.invalid && ticketForm.get('title')?.touched) {
+            @if (ticketForm.get('title')?.hasError('required')) {
+              <small class="text-danger">El título es obligatorio</small>
+            } @else if (ticketForm.get('title')?.hasError('maxlength')) {
+              <small class="text-danger">El título no puede superar los 150 caracteres</small>
+            }
+          }
         </div>
-      </div>
 
+        <!-- Descripción -->
+        <div class="mb-3">
+          <label class="form-label fw-medium">Descripción</label>
+          <textarea
+            class="form-control"
+            rows="5"
+            placeholder="Explica el problema con detalle"
+            formControlName="description"
+          ></textarea>
+          @if (ticketForm.get('description')?.invalid && ticketForm.get('description')?.touched) {
+            <small class="text-danger">La descripción es obligatoria</small>
+          }
+        </div>
+
+        <!-- Prioridad y Categoría en la misma fila -->
+        <div class="row">
+          <div class="col-12 col-md-6 mb-3">
+            <label class="form-label fw-medium">Prioridad</label>
+            <select class="form-select" formControlName="priority">
+              <option value="">Selecciona una prioridad</option>
+              <option value="LOW">Baja</option>
+              <option value="MEDIUM">Media</option>
+              <option value="HIGH">Alta</option>
+              <option value="CRITICAL">Crítica</option>
+            </select>
+            @if (ticketForm.get('priority')?.invalid && ticketForm.get('priority')?.touched) {
+              <small class="text-danger">La prioridad es obligatoria</small>
+            }
+          </div>
+
+          <div class="col-12 col-md-6 mb-3">
+            <label class="form-label fw-medium">Categoría</label>
+            <select class="form-select" formControlName="categoryId">
+              <option value="">Selecciona una categoría</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+            @if (ticketForm.get('categoryId')?.invalid && ticketForm.get('categoryId')?.touched) {
+              <small class="text-danger">La categoría es obligatoria</small>
+            }
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-2">
+          <a routerLink="/tickets/my-tickets" class="btn btn-outline-secondary"> Cancelar </a>
+          <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+            @if (isLoading()) {
+              Creando...
+            } @else {
+              Crear Ticket
+            }
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
