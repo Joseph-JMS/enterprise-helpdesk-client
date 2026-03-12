@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { CommentRequest, CommentResponse } from '../interfaces/comment.interface';
 
 @Injectable({providedIn: 'root'})
-export class ServiceNameService {
+export class CommentService {
 
     private readonly http = inject(HttpClient);
     private readonly API_URL = `${environment.baseUrl}/tickets`;

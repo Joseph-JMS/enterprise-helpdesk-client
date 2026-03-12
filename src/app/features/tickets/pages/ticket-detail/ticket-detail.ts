@@ -9,6 +9,8 @@ import { StatusClassPipe } from '../../../../core/pipes/status-class.pipe';
 import { PriorityLabelPipe } from '../../../../core/pipes/priority-label.pipe';
 import { PriorityClassPipe } from '../../../../core/pipes/priority-class.pipe';
 import { DatePipe } from '@angular/common';
+import { CommentService } from '../../../../core/services/comment.service';
+import { CommentResponse } from '../../../../core/interfaces/comment.interface';
 
 @Component({
   selector: 'ticket-detail',
@@ -19,14 +21,19 @@ export class TicketDetail implements OnInit{
 
   private readonly ticketService = inject(TicketService);
   private readonly authService = inject(AuthService);
+  private readonly commentService = inject(CommentService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   ticket = signal<TicketResponse | null>(null);
   history = signal<TicketStatusHistoryResponse[]>([]);
+  comments = signal<CommentResponse[]>([]);
+
   isLoading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
   isProcessing = signal<boolean>(false);
+  isSubmittingComment = signal<boolean>(false);
+  commentContent = signal<string>('');
 
   readonly isAdmin = this.authService.isAdmin;
   readonly isTechnician = this.authService.isTechnician;
@@ -45,6 +52,7 @@ export class TicketDetail implements OnInit{
         this.ticket.set(data);
         this.isLoading.set(false);
         this.loadHistory(id);
+        this.loadComments(id);
       },
       error: () => {
         this.errorMessage.set('Error al cargar el ticket');
@@ -57,6 +65,45 @@ export class TicketDetail implements OnInit{
     this.ticketService.getHistory(id).subscribe({
       next: (data) => this.history.set(data),
       error: () => {}
+    });
+  }
+
+  loadComments(ticketId: number) {
+    this.commentService.getByTicket(ticketId).subscribe({
+      next: (data) => this.comments.set(data),
+      error: () => {}
+    });
+  }
+
+  submitComment() {
+    const content = this.commentContent().trim();
+    if (!content) return;
+
+    const ticketId = this.ticket()?.id;
+    if (!ticketId) return;
+
+    this.isSubmittingComment.set(true);
+    this.commentService.create(ticketId, { content }).subscribe({
+      next: (comment) => {
+        console.log('Comentario recibido:', comment);
+        this.comments.update(list => [...list, comment]);
+        this.commentContent.set('');
+        this.isSubmittingComment.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Error al enviar el comentario');
+        this.isSubmittingComment.set(false);
+      }
+    });
+  }
+
+  deleteComment(commentId: number) {
+    const ticketId = this.ticket()?.id;
+    if (!ticketId) return;
+
+    this.commentService.delete(ticketId, commentId).subscribe({
+      next: () => this.comments.update(list => list.filter(c => c.id !== commentId)),
+      error: () => this.errorMessage.set('Error al eliminar el comentario')
     });
   }
 

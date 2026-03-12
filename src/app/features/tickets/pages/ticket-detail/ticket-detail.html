@@ -49,6 +49,72 @@
           </div>
         </div>
 
+        <!-- Comentarios -->
+        <div class="card border-0 shadow-sm mt-4">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">Comentarios</h6>
+
+            @if (comments().length === 0) {
+              <p class="text-muted small mb-3">No hay comentarios aún.</p>
+            } @else {
+              <div class="d-flex flex-column gap-3 mb-4">
+                @for (comment of comments(); track comment.id) {
+                  <div class="d-flex gap-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold flex-shrink-0"
+                        style="width: 32px; height: 32px; font-size: 0.75rem;">
+                      {{ comment.authorUsername.charAt(0).toUpperCase() }}
+                    </div>
+                    <div class="flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                          <span class="fw-semibold small">{{ comment.authorUsername }}</span>
+                          <span class="text-muted small ms-2">
+                            {{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                          </span>
+                        </div>
+                        @if (isAdmin() || comment.authorUsername === currentUser()?.username) {
+                          <button
+                            class="btn btn-sm text-danger p-0"
+                            (click)="deleteComment(comment.id)">
+                            <small>Eliminar</small>
+                          </button>
+                        }
+                      </div>
+                      <p class="text-muted small mb-0 mt-1">{{ comment.content }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Formulario nuevo comentario -->
+            @if (ticket()!.status !== 'CLOSED' && ticket()!.status !== 'CANCELLED') {
+              <div class="border-top pt-3">
+                <textarea
+                  class="form-control mb-2"
+                  rows="3"
+                  placeholder="Escribe un comentario..."
+                  [value]="commentContent()"
+                  (input)="commentContent.set($any($event.target).value)">
+                </textarea>
+                <div class="d-flex justify-content-end">
+                  <button
+                    class="btn btn-primary btn-sm fw-bold"
+                    [disabled]="isSubmittingComment() || !commentContent().trim()"
+                    (click)="submitComment()">
+                    @if (isSubmittingComment()) {
+                      Enviando...
+                    } @else {
+                      Comentar
+                    }
+                  </button>
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+
       </div>
 
       <!-- Columna lateral -->
