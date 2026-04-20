@@ -5,6 +5,9 @@ import { TicketResponse } from '../../../../core/interfaces/ticket.interface';
 import { TicketService } from '../../../../core/services/ticket.service';
 import { Router } from '@angular/router';
 import { TicketCard } from "../../components/ticket-card/ticket-card";
+import { UserService } from '../../../../core/services/user.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UserResponse } from '../../../../core/interfaces/user.interface';
 
 @Component({
   selector: 'app-unassigned-tickets',
@@ -13,10 +16,14 @@ import { TicketCard } from "../../components/ticket-card/ticket-card";
 })
 export class UnassignedTickets {
 
-    private readonly ticketService = inject(TicketService);
+  private readonly ticketService = inject(TicketService);
+  private readonly userService = inject(UserService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   tickets = signal<TicketResponse[]>([]);
+  technicians = signal<UserResponse[]>([]);
+  selectedTechnicianMap = signal<Record<number, string>>({});
   isLoading = signal<boolean>(true);
   isProcessing = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
@@ -25,8 +32,14 @@ export class UnassignedTickets {
   totalElements = signal<number>(0);
   pageSize = 10;
 
+  readonly isAdmin = this.authService.isAdmin;
+  readonly isTechnician = this.authService.isTechnician;
+
   ngOnInit() {
     this.loadTickets();
+    if (this.isAdmin()) {
+      this.loadTechnicians();
+    }
   }
 
   loadTickets(page: number = 0) {
@@ -48,6 +61,13 @@ export class UnassignedTickets {
     });
   }
 
+  loadTechnicians() {
+    this.userService.getByRole('ROLE_TECHNICIAN').subscribe({
+      next: (data) => this.technicians.set(data.content),
+      error: () => {}
+    });
+  }
+
   goToPage(page: number) {
     if (page >= 0 && page < this.totalPages()) {
       this.loadTickets(page);
@@ -58,9 +78,30 @@ export class UnassignedTickets {
     this.router.navigate(['/tickets', id]);
   }
 
+  onTechnicianSelect(ticketId: number, username: string) {
+    this.selectedTechnicianMap.update(map => ({ ...map, [ticketId]: username }));
+  }
+
   assignToMe(id: number) {
     this.isProcessing.set(true);
     this.ticketService.assign(id).subscribe({
+      next: () => {
+        this.isProcessing.set(false);
+        this.loadTickets(this.currentPage());
+      },
+      error: () => {
+        this.errorMessage.set('Error al asignar el ticket');
+        this.isProcessing.set(false);
+      }
+    });
+  }
+
+  assignTo(ticketId: number) {
+    const username = this.selectedTechnicianMap()[ticketId];
+    if (!username) return;
+
+    this.isProcessing.set(true);
+    this.ticketService.assign(ticketId, username).subscribe({
       next: () => {
         this.isProcessing.set(false);
         this.loadTickets(this.currentPage());
