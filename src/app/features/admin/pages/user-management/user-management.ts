@@ -64,7 +64,7 @@ export class UserManagement {
   }
 
   goToCreate() {
-    this.router.navigate(['/admin/users/create']);
+    this.router.navigate(['/admin/users/new']);
   }
 
   goToEdit(id: number) {
