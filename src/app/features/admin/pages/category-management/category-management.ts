@@ -50,7 +50,7 @@ export class CategoryManagement {
   }
 
   goToCreate() {
-    this.router.navigate(['/admin/categories/create']);
+    this.router.navigate(['/admin/categories/new']);
   }
 
   goToEdit(id: number) {
