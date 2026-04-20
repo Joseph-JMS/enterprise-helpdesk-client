@@ -24,12 +24,35 @@
               (click)="goToDetail(ticket.id)">
               Ver detalle
             </button>
-            <button
-              class="btn btn-primary btn-sm w-100 fw-bold"
-              [disabled]="isProcessing()"
-              (click)="assignToMe(ticket.id)">
-              Asignarme
-            </button>
+
+            @if (isTechnician()) {
+              <button
+                class="btn btn-primary btn-sm w-100 fw-bold"
+                [disabled]="isProcessing()"
+                (click)="assignToMe(ticket.id)">
+                Asignarme
+              </button>
+            }
+
+            @if (isAdmin()) {
+              <select
+                class="form-select form-select-sm"
+                (change)="onTechnicianSelect(ticket.id, $any($event.target).value)">
+                <option value="">Seleccionar técnico</option>
+                @for (tech of technicians(); track tech.id) {
+                  <option [value]="tech.username">
+                    {{ tech.firstName }} {{ tech.lastName }}
+                  </option>
+                }
+              </select>
+              <button
+                class="btn btn-primary btn-sm w-100 fw-bold"
+                [disabled]="isProcessing() || !selectedTechnicianMap()[ticket.id]"
+                (click)="assignTo(ticket.id)">
+                Asignar
+              </button>
+            }
+
           </ticket-card>
         </div>
       }
