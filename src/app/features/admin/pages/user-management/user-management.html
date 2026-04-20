@@ -1,1 +1,99 @@
-<p>user-management works!</p>,
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold mb-0">Gestión de Usuarios</h4>
+      <p class="text-muted small mb-0">{{ totalElements() }} usuarios registrados</p>
+    </div>
+    <button class="btn btn-primary fw-bold" (click)="goToCreate()">
+      + Nuevo Usuario
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-muted small mt-2">Cargando usuarios...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else if (users().length === 0) {
+    <div class="text-center py-5">
+      <p class="text-muted mb-3">No hay usuarios registrados.</p>
+    </div>
+  } @else {
+
+    <div class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="fw-medium">#</th>
+              <th class="fw-medium">Usuario</th>
+              <th class="fw-medium">Email</th>
+              <th class="fw-medium">Nombre</th>
+              <th class="fw-medium">Roles</th>
+              <th class="fw-medium">Estado</th>
+              <th class="fw-medium">Creado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.id) {
+              <tr>
+                <td class="text-muted">{{ user.id }}</td>
+                <td class="fw-medium">{{ user.username }}</td>
+                <td class="text-muted">{{ user.email }}</td>
+                <td>{{ user.firstName }} {{ user.lastName }}</td>
+                <td>
+                  <div class="d-flex gap-1 flex-wrap">
+                    @for (role of user.roles; track role) {
+                      <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary fw-normal">
+                        {{ role }}
+                      </span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  @if (user.enabled) {
+                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success fw-normal">
+                      Activo
+                    </span>
+                  } @else {
+                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger fw-normal">
+                      Inactivo
+                    </span>
+                  }
+                </td>
+                <td class="text-muted">{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <button
+                      class="btn btn-sm btn-outline-secondary fw-bold"
+                      (click)="goToEdit(user.id)">
+                      Editar
+                    </button>
+                    <button
+                      class="btn btn-sm fw-bold"
+                      [class]="user.enabled ? 'btn-outline-danger' : 'btn-outline-success'"
+                      (click)="toggleUser(user.id)">
+                      {{ user.enabled ? 'Desactivar' : 'Activar' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <app-pagination
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      (pageChange)="goToPage($event)"
+    />
+
+  }
+
+</div>
