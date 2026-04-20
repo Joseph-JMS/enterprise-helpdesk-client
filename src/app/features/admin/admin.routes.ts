@@ -19,10 +19,10 @@ export const adminRoutes: Routes = [
                         path: 'new',
                         component: CategoryForm,
                     },
-                    // {
-                    //     path: 'edit/:id',
-                    //     component: CategoryForm,
-                    // },
+                    {
+                        path: 'edit/:id',
+                        component: CategoryForm,
+                    },
                 ],
             },
             {
