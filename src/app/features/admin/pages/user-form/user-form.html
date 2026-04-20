@@ -1,1 +1,158 @@
-<p>user-form works!</p>,
+<div class="container py-4" style="max-width: 700px;">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">
+      {{ isEditMode() ? 'Editar Usuario' : 'Nuevo Usuario' }}
+    </h4>
+    <p class="text-muted small mb-0">
+      {{ isEditMode() ? 'Modifica los datos del usuario' : 'Completa los datos para crear un usuario' }}
+    </p>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  }
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
+        @if (!isEditMode()) {
+          <!-- Username -->
+          <div class="mb-3">
+            <label class="form-label fw-medium">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nombre de usuario"
+              formControlName="username"
+            />
+            @if (userForm.get('username')?.invalid && userForm.get('username')?.touched) {
+              @if (userForm.get('username')?.hasError('required')) {
+                <small class="text-danger">El username es obligatorio</small>
+              } @else if (userForm.get('username')?.hasError('minlength')) {
+                <small class="text-danger">Mínimo 3 caracteres</small>
+              }
+            }
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label class="form-label fw-medium">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Contraseña"
+              formControlName="password"
+            />
+            @if (userForm.get('password')?.invalid && userForm.get('password')?.touched) {
+              @if (userForm.get('password')?.hasError('required')) {
+                <small class="text-danger">La contraseña es obligatoria</small>
+              } @else if (userForm.get('password')?.hasError('minlength')) {
+                <small class="text-danger">Mínimo 6 caracteres</small>
+              }
+            }
+          </div>
+        }
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label fw-medium">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            placeholder="correo@empresa.com"
+            formControlName="email"
+          />
+          @if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+            @if (userForm.get('email')?.hasError('required')) {
+              <small class="text-danger">El email es obligatorio</small>
+            } @else if (userForm.get('email')?.hasError('email')) {
+              <small class="text-danger">El email no es válido</small>
+            }
+          }
+        </div>
+
+        <!-- Nombre y Apellido -->
+        <div class="row">
+          <div class="col-12 col-md-6 mb-3">
+            <label class="form-label fw-medium">Nombre</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Nombre"
+              formControlName="firstName"
+            />
+            @if (userForm.get('firstName')?.invalid && userForm.get('firstName')?.touched) {
+              <small class="text-danger">El nombre es obligatorio</small>
+            }
+          </div>
+          <div class="col-12 col-md-6 mb-3">
+            <label class="form-label fw-medium">Apellido</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Apellido"
+              formControlName="lastName"
+            />
+            @if (userForm.get('lastName')?.invalid && userForm.get('lastName')?.touched) {
+              <small class="text-danger">El apellido es obligatorio</small>
+            }
+          </div>
+        </div>
+
+        <!-- Roles -->
+        <div class="mb-4">
+          <label class="form-label fw-medium">Roles</label>
+          <div formGroupName="roles" class="d-flex flex-column gap-2">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="roleAdmin"
+                formControlName="ROLE_ADMIN"
+              />
+              <label class="form-check-label" for="roleAdmin">Administrador</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="roleTechnician"
+                formControlName="ROLE_TECHNICIAN"
+              />
+              <label class="form-check-label" for="roleTechnician">Técnico</label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="roleUser"
+                formControlName="ROLE_USER"
+              />
+              <label class="form-check-label" for="roleUser">Usuario</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end">
+          <a routerLink="/admin/users" class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button
+            type="submit"
+            class="btn btn-primary fw-bold"
+            [disabled]="isLoading()">
+            @if (isLoading()) {
+              Guardando...
+            } @else {
+              {{ isEditMode() ? 'Guardar cambios' : 'Crear Usuario' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>
