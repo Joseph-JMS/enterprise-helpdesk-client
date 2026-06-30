@@ -1,1 +1,115 @@
-<p>performance-report works!</p>,
+<div class="container py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">Reporte de Rendimiento</h4>
+    <p class="text-muted small mb-0">
+      {{ isAdmin() ? 'Rendimiento de todos los técnicos' : 'Tu rendimiento como técnico' }}
+    </p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-muted small mt-2">Cargando reporte...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else {
+
+    @if (isAdmin()) {
+
+      @if (technicians().length === 0) {
+        <div class="text-center py-5">
+          <p class="text-muted mb-0">No hay técnicos registrados.</p>
+        </div>
+      } @else {
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="fw-medium">Técnico</th>
+                  <th class="fw-medium">Asignados</th>
+                  <th class="fw-medium">Resueltos</th>
+                  <th class="fw-medium">Tasa de resolución</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (tech of technicians(); track tech.technicianUsername) {
+                  <tr>
+                    <td class="fw-medium">{{ tech.technicianUsername }}</td>
+                    <td>{{ tech.assignedTickets }}</td>
+                    <td>{{ tech.resolvedTickets }}</td>
+                    <td>
+                      @if (tech.assignedTickets > 0) {
+                        <div class="d-flex align-items-center gap-2">
+                          <div class="progress flex-grow-1" style="height: 8px;">
+                            <div
+                              class="progress-bar bg-success"
+                              [style.width.%]="(tech.resolvedTickets / tech.assignedTickets) * 100">
+                            </div>
+                          </div>
+                          <small class="text-muted">
+                            {{ ((tech.resolvedTickets / tech.assignedTickets) * 100) | number:'1.0-0' }}%
+                          </small>
+                        </div>
+                      } @else {
+                        <small class="text-muted">Sin tickets</small>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+    } @else {
+
+      @if (myPerformance()) {
+        <div class="row g-4">
+          <div class="col-12 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+              <div class="card-body p-4">
+                <p class="text-muted small fw-medium mb-1">Tickets Asignados</p>
+                <h2 class="fw-bold text-primary mb-0">{{ myPerformance()!.assignedTickets }}</h2>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+              <div class="card-body p-4">
+                <p class="text-muted small fw-medium mb-1">Tickets Resueltos</p>
+                <h2 class="fw-bold text-success mb-0">{{ myPerformance()!.resolvedTickets }}</h2>
+              </div>
+            </div>
+          </div>
+          @if (myPerformance()!.assignedTickets > 0) {
+            <div class="col-12">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                  <p class="text-muted small fw-medium mb-2">Tasa de resolución</p>
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="progress flex-grow-1" style="height: 12px;">
+                      <div
+                        class="progress-bar bg-success"
+                        [style.width.%]="(myPerformance()!.resolvedTickets / myPerformance()!.assignedTickets) * 100">
+                      </div>
+                    </div>
+                    <h5 class="fw-bold text-success mb-0">
+                      {{ ((myPerformance()!.resolvedTickets / myPerformance()!.assignedTickets) * 100) | number:'1.0-0' }}%
+                    </h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+    }
+
+  }
+
+</div>
