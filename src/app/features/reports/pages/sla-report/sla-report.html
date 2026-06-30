@@ -1,1 +1,63 @@
-<p>sla-report works!</p>,
+<div class="container py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">Reporte SLA</h4>
+    <p class="text-muted small mb-0">Cumplimiento de tiempos de resolución por prioridad</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-muted small mt-2">Cargando reporte...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else if (slaData().length === 0) {
+    <div class="text-center py-5">
+      <p class="text-muted mb-0">No hay datos disponibles.</p>
+    </div>
+  } @else {
+
+    <div class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="fw-medium">Prioridad</th>
+              <th class="fw-medium">Límite SLA</th>
+              <th class="fw-medium">Total</th>
+              <th class="fw-medium">Dentro del SLA</th>
+              <th class="fw-medium">Fuera del SLA</th>
+              <th class="fw-medium">Cumplimiento</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of slaData(); track item.priority) {
+              <tr>
+                <td class="fw-medium">{{ item.priority }}</td>
+                <td class="text-muted">{{ item.thresholdHours }}h</td>
+                <td>{{ item.totalTickets }}</td>
+                <td class="text-success fw-medium">{{ item.withinSla }}</td>
+                <td class="text-danger fw-medium">{{ item.breachedSla }}</td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="progress flex-grow-1" style="height: 8px; min-width: 100px;">
+                      <div
+                        class="progress-bar"
+                        [class]="item.compliancePercentage >= 80 ? 'bg-success' : item.compliancePercentage >= 50 ? 'bg-warning' : 'bg-danger'"
+                        [style.width.%]="item.compliancePercentage">
+                      </div>
+                    </div>
+                    <small class="fw-bold">{{ item.compliancePercentage | number:'1.0-0' }}%</small>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+
+</div>
