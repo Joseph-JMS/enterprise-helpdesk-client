@@ -1,1 +1,77 @@
-<p>summary-report works!</p>,
+<div class="container py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">Resumen General</h4>
+    <p class="text-muted small mb-0">Estado actual del sistema de tickets</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-muted small mt-2">Cargando resumen...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else if (summary()) {
+
+    <div class="row g-4">
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <p class="text-muted small fw-medium mb-1">Total Tickets</p>
+            <h2 class="fw-bold mb-0">{{ summary()!.totalTickets }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+          <div class="card-body p-4">
+            <p class="text-muted small fw-medium mb-1">Abiertos</p>
+            <h2 class="fw-bold text-primary mb-0">{{ summary()!.open }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+          <div class="card-body p-4">
+            <p class="text-muted small fw-medium mb-1">En Progreso</p>
+            <h2 class="fw-bold text-warning mb-0">{{ summary()!.inProgress }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+          <div class="card-body p-4">
+            <p class="text-muted small fw-medium mb-1">Resueltos</p>
+            <h2 class="fw-bold text-success mb-0">{{ summary()!.resolved }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-secondary">
+          <div class="card-body p-4">
+            <p class="text-muted small fw-medium mb-1">Cerrados</p>
+            <h2 class="fw-bold text-secondary mb-0">{{ summary()!.closed }}</h2>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100 border-start border-4 border-danger">
+          <div class="card-body p-4">
+            <p class="text-muted small fw-medium mb-1">Cancelados</p>
+            <h2 class="fw-bold text-danger mb-0">{{ summary()!.cancelled }}</h2>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  }
+
+</div>
