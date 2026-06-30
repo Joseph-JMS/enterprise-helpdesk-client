@@ -1,1 +1,53 @@
-<p>category-report works!</p>,
+<div class="container py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold mb-0">Tickets por Categoría</h4>
+    <p class="text-muted small mb-0">Distribución de tickets según categoría</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+      <p class="text-muted small mt-2">Cargando reporte...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">{{ errorMessage() }}</div>
+  } @else if (categories().length === 0) {
+    <div class="text-center py-5">
+      <p class="text-muted mb-0">No hay datos disponibles.</p>
+    </div>
+  } @else {
+
+    <div class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="fw-medium">Categoría</th>
+              <th class="fw-medium">Total Tickets</th>
+              <th class="fw-medium">Distribución</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of categories(); track item.categoryName) {
+              <tr>
+                <td class="fw-medium">{{ item.categoryName }}</td>
+                <td>{{ item.totalTickets }}</td>
+                <td style="min-width: 200px;">
+                  <div class="progress" style="height: 8px;">
+                    <div
+                      class="progress-bar bg-primary"
+                      [style.width.%]="(item.totalTickets / maxTickets()) * 100">
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+
+</div>
