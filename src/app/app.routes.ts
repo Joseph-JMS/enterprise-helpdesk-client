@@ -30,6 +30,10 @@ export const routes: Routes = [
                 loadChildren: () => import('./features/reports/reports.routes'),
             },
             {
+                path: 'profile',
+                loadChildren: () => import('./features/profile/profile.routes')
+            },
+            {
                 path: '',
                 redirectTo: 'dashboard',
                 pathMatch: 'full'
