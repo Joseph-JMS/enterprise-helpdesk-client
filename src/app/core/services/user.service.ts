@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { PageResponse } from '../interfaces/page.interface';
-import { CreateUserRequest, UpdateUserRequest, UserResponse } from '../interfaces/user.interface';
+import { ChangePasswordRequest, CreateUserRequest, UpdateProfileRequest, UpdateUserRequest, UserResponse } from '../interfaces/user.interface';
 
 @Injectable({providedIn: 'root'})
 export class UserService {
@@ -41,6 +41,18 @@ export class UserService {
 
     delete(id: number): Observable<void> {
         return this.http.delete<void>(`${this.API_URL}/${id}`);
+    }
+
+    getMe():Observable<UserResponse> {
+        return this.http.get<UserResponse>(`${this.API_URL}/me`);
+    }
+
+    updateProfile(request: UpdateProfileRequest): Observable<UserResponse> {
+        return this.http.put<UserResponse>(`${this.API_URL}/me`, request);
+    }
+
+    changePassword(request: ChangePasswordRequest): Observable<void> {
+        return this.http.patch<void>(`${this.API_URL}/me/password`, request);
     }
     
 }
