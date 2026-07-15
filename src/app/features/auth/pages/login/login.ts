@@ -48,7 +48,12 @@ export class Login {
 
     this.authService.login(data).subscribe({
       next: (res) => {
-        this.router.navigate(['/dashboard']);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        if (returnUrl?.startsWith('/')) {
+          this.router.navigateByUrl(returnUrl);
+        } else {
+          this.router.navigate(['/dashboard'])
+        }
       },
       error: (err) => {
         this.errorMessage.set(err.error?.detail ?? 'Credenciales incorrectas. Intentelo de nuevo.');

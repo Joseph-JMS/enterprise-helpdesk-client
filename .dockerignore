@@ -1,0 +1,27 @@
+# Proyecto
+node_modules/
+dist/
+.angular/
+
+# Configuracion de editores
+.vscode/
+.idea/
+*.iml
+
+# Logs de errores
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Control de versiones
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Temporales
+.DS_Store
+Thumbs.db

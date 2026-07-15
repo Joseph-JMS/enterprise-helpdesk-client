@@ -29,6 +29,7 @@ export class AuthService {
     readonly isAdminOrTechnician = computed(() =>
         this.hasAnyRole(['ROLE_ADMIN', 'ROLE_TECHNICIAN'])
     );
+    readonly canCreateTickets = computed(() => this.hasRole('ROLE_USER'));
 
     constructor() {}
 
